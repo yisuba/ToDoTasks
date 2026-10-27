@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDoTasks</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>ToDoTasks</h1>
+    <button id="btn-salir" hidden>Salir</button>
+  </header>
+
+  <section id="pantalla-login" class="centrado" hidden>
+    <p>Inicia sesión para ver tus tareas.</p>
+    <button id="btn-login">Entrar con Google</button>
+  </section>
+
+  <main id="pantalla-app" hidden>
+    <form id="form-tarea" class="nueva-tarea">
+      <input id="titulo" placeholder="Nueva tarea" required>
+      <select id="categoria">
+        <option>Universidad</option>
+        <option>Personal</option>
+        <option>Proyectos</option>
+      </select>
+      <button type="submit">Agregar</button>
+    </form>
+    <div id="lista"></div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

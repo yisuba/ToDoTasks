@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDoc, getDocs, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -30,6 +30,8 @@ let tareas = [];
 let unsubs = [];
 let tema = leerTemaLocal();
 let hueNuevo = HUES[0];
+let ocultas = new Set();   // ids de categorías desmarcadas en la barra (por defecto, ninguna)
+let vista = "tareas";      // "tareas" o "papelera"
 
 function leerTemaLocal() {
   try { return localStorage.getItem(TEMA_LOCAL) === "claro" ? "claro" : "oscuro"; }
@@ -141,12 +143,10 @@ $("btn-tema").onclick = () => {
 
 // ---------- Sesión ----------
 $("btn-login").onclick = () => signInWithPopup(auth, provider).catch(e => alert(e.message));
-$("btn-salir").onclick = () => signOut(auth);
 
 onAuthStateChanged(auth, user => {
   $("pantalla-login").hidden = !!user;
   $("pantalla-app").hidden = !user;
-  $("btn-salir").hidden = !user;
   unsubs.forEach(f => f());
   unsubs = [];
   if (user) {
@@ -244,7 +244,20 @@ $("form-tarea").onsubmit = async e => {
   e.target.reset();
 };
 
-$("orden").onchange = () => renderTareas();
+$("orden").onchange = () => renderVista();
+
+// ---------- Barra lateral y diálogos ----------
+$("chk-todas").onchange = () => {
+  const marcar = $("chk-todas").checked;
+  ocultas = new Set(marcar ? [] : categoriasActivas().map(c => c.id));
+  vista = "tareas";
+  render();
+};
+$("nav-papelera").onclick = () => { vista = "papelera"; render(); };
+$("btn-crear-cat").onclick = () => { renderFormCategoria(); $("dlg-crear").showModal(); };
+$("btn-cancelar-cat").onclick = () => $("dlg-crear").close();
+$("btn-modificar-cat").onclick = () => $("dlg-modificar").showModal();
+$("btn-cerrar-mod").onclick = () => $("dlg-modificar").close();
 
 // ---------- Crear categoría ----------
 $("form-categoria").onsubmit = async e => {
@@ -258,49 +271,80 @@ $("form-categoria").onsubmit = async e => {
     creada: serverTimestamp()
   }).catch(alertar);
   e.target.reset();
+  $("dlg-crear").close();
 };
 
 // ---------- Render ----------
 function render() {
+  renderNav();
   renderSelectCategorias();
   renderCategorias();
   renderFormCategoria();
-  renderTareas();
+  renderVista();
 }
 
 const porAntiguedad = (a, b) => msDe(a.creada) - msDe(b.creada);
+const categoriasActivas = () => categorias.filter(c => !c.eliminada).sort(porAntiguedad);
+
+// Una tarea se muestra si su categoría está marcada (o no tiene categoría) y no está en papelera
+function esVisible(t) {
+  const c = categorias.find(x => x.id === t.categoriaId);
+  if (!c) return true;
+  if (c.eliminada) return false;
+  return !ocultas.has(c.id);
+}
+
+function renderNav() {
+  const activas = categoriasActivas();
+  const visibles = activas.filter(c => !ocultas.has(c.id));
+
+  const chk = $("chk-todas");
+  chk.checked = activas.length > 0 && visibles.length === activas.length;
+  chk.indeterminate = visibles.length > 0 && visibles.length < activas.length;
+  $("cnt-todas").textContent = String(tareas.filter(t => !t.hecha && esVisible(t)).length);
+
+  const nav = $("nav-categorias");
+  nav.innerHTML = "";
+  activas.forEach(c => {
+    const pendientes = tareas.filter(t => t.categoriaId === c.id && !t.hecha).length;
+    const lbl = el("label", "nav-item");
+    const cb = el("input");
+    cb.type = "checkbox";
+    cb.checked = !ocultas.has(c.id);
+    cb.onchange = () => {
+      if (cb.checked) ocultas.delete(c.id); else ocultas.add(c.id);
+      vista = "tareas";
+      render();
+    };
+    const punto = el("span", "punto");
+    punto.style.background = colorTono(c.hue, 2, oscuro());
+    lbl.append(cb, punto, el("span", "nombre", c.nombre), el("span", "conteo", String(pendientes)));
+    nav.appendChild(lbl);
+  });
+
+  const eliminadas = categorias.filter(c => c.eliminada).length;
+  $("cnt-papelera").textContent = String(eliminadas);
+  $("nav-papelera").classList.toggle("activo", vista === "papelera");
+}
 
 function renderSelectCategorias() {
   const sel = $("categoria");
   const previa = sel.value;
   sel.innerHTML = "";
-  categorias
-    .filter(c => !c.eliminada)
-    .sort(porAntiguedad)
-    .forEach(c => {
-      const o = el("option", "", c.nombre);
-      o.value = c.id;
-      sel.appendChild(o);
-    });
+  categoriasActivas().forEach(c => {
+    const o = el("option", "", c.nombre);
+    o.value = c.id;
+    sel.appendChild(o);
+  });
   if ([...sel.options].some(o => o.value === previa)) sel.value = previa;
   $("btn-agregar").disabled = sel.options.length === 0;
 }
 
+// Lista de categorías dentro de "Modificar categorías"
 function renderCategorias() {
   const cont = $("lista-categorias");
   cont.innerHTML = "";
-  categorias
-    .filter(c => !c.eliminada)
-    .sort(porAntiguedad)
-    .forEach(c => cont.appendChild(filaCategoria(c)));
-
-  const papelera = $("lista-papelera");
-  papelera.innerHTML = "";
-  const eliminadas = categorias.filter(c => c.eliminada).sort(porAntiguedad);
-  if (eliminadas.length === 0) {
-    papelera.appendChild(el("p", "muted", "La papelera está vacía."));
-  }
-  eliminadas.forEach(c => papelera.appendChild(filaPapelera(c)));
+  categoriasActivas().forEach(c => cont.appendChild(filaCategoria(c)));
 }
 
 function filaCategoria(c) {
@@ -323,7 +367,7 @@ function filaCategoria(c) {
   borrar.title = "Mover a la papelera";
   borrar.onclick = () => {
     let msg = `¿Mover "${c.nombre}" a la papelera?`;
-    if (n) msg += `\nSus ${n} tarea(s) seguirán asignadas hasta que la elimines definitivamente.`;
+    if (n) msg += `\nSus ${n} tarea(s) quedarán en la papelera junto con la categoría.`;
     if (confirm(msg)) updateDoc(refCat(c.id), { eliminada: true }).catch(alertar);
   };
 
@@ -331,10 +375,10 @@ function filaCategoria(c) {
   return fila;
 }
 
+// Fila de una categoría en la papelera (vista Papelera)
 function filaPapelera(c) {
   const fila = el("div", "cat-fila");
-  fila.appendChild(el("span", "muted", c.nombre));
-  fila.appendChild(el("span", "", ""));
+  fila.appendChild(el("span", "nombre-papelera", c.nombre));
 
   const restaurar = el("button", "", "Restaurar");
   restaurar.onclick = () => updateDoc(refCat(c.id), { eliminada: false }).catch(alertar);
@@ -357,6 +401,7 @@ function renderFormCategoria() {
   cont.appendChild(swatches(hueNuevo, h => { hueNuevo = h; renderFormCategoria(); }));
 }
 
+// Orden: la más próxima arriba; sin deadline al final
 const porDeadline = (a, b) => {
   if (!a.deadline && !b.deadline) return 0;
   if (!a.deadline) return 1;
@@ -364,14 +409,52 @@ const porDeadline = (a, b) => {
   return a.deadline - b.deadline;
 };
 
-function renderTareas() {
+function renderVista() {
+  const enPapelera = vista === "papelera";
+  $("form-tarea").hidden = enPapelera;
+  $("barra-orden").hidden = enPapelera;
   const lista = $("lista");
   lista.innerHTML = "";
+
+  if (enPapelera) {
+    $("titulo-vista").textContent = "Papelera";
+    const eliminadas = categorias.filter(c => c.eliminada).sort(porAntiguedad);
+    if (eliminadas.length === 0) {
+      lista.appendChild(el("p", "muted vacio", "La papelera está vacía."));
+      return;
+    }
+    const bloque = el("div", "papelera-cats");
+    eliminadas.forEach(c => bloque.appendChild(filaPapelera(c)));
+    lista.appendChild(bloque);
+
+    const ids = new Set(eliminadas.map(c => c.id));
+    const enPapeleraTareas = tareas.filter(t => ids.has(t.categoriaId)).sort(porDeadline);
+    if (enPapeleraTareas.length === 0) {
+      lista.appendChild(el("p", "muted", "Estas categorías no tienen tareas."));
+    }
+    enPapeleraTareas.forEach(t => lista.appendChild(crearTarjeta(t)));
+    return;
+  }
+
+  const activas = categoriasActivas();
+  const visibles = activas.filter(c => !ocultas.has(c.id));
+  if (visibles.length === activas.length) {
+    $("titulo-vista").textContent = "Todas las tareas";
+  } else if (visibles.length === 0) {
+    $("titulo-vista").textContent = "Ninguna categoría marcada";
+  } else {
+    $("titulo-vista").textContent = "Categorías seleccionadas";
+  }
+
   const orden = $("orden").value;
-  const ordenadas = [...tareas].sort(
+  const mostrar = tareas.filter(esVisible).sort(
     orden === "deadline" ? porDeadline : (a, b) => msDe(b.creada) - msDe(a.creada)
   );
-  ordenadas.forEach(t => lista.appendChild(crearTarjeta(t)));
+  if (mostrar.length === 0) {
+    lista.appendChild(el("p", "muted vacio", "No hay tareas para mostrar."));
+    return;
+  }
+  mostrar.forEach(t => lista.appendChild(crearTarjeta(t)));
 }
 
 function crearTarjeta(t) {
@@ -407,7 +490,7 @@ function crearTarjeta(t) {
   // Deadline y tono
   const meta = el("div", "meta");
   if (t.deadline) {
-    const txt = (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline) + " (Santiago)";
+    const txt = (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline);
     meta.appendChild(el("span", vencida ? "vencida-txt" : "", txt));
   } else {
     meta.appendChild(el("span", "", "Sin deadline"));
@@ -430,18 +513,21 @@ function crearTarjeta(t) {
   }
 
   if (cat) {
-    const tonos = el("div", "tonos");
-    tonos.appendChild(el("span", "", "Tono:"));
+    // Menú desplegable de tonos: cada opción muestra su color
+    const sel = el("select", "tono-select");
+    sel.title = "Tono de la tarea";
+    sel.style.background = colorTono(cat.hue, tono, oscuro());
+    sel.style.color = oscuro() ? "#eceef3" : "#222";
     for (let i = 0; i < TONOS; i++) {
-      const b = el("button", "swatch");
-      b.type = "button";
-      b.style.background = colorTono(cat.hue, i, oscuro());
-      b.title = "Tono " + (i + 1);
-      if (i === tono) b.classList.add("activo");
-      b.onclick = () => updateDoc(ref, { tono: i }).catch(alertar);
-      tonos.appendChild(b);
+      const o = el("option", "", `Tono ${i + 1}`);
+      o.value = String(i);
+      o.style.background = colorTono(cat.hue, i, oscuro());
+      o.style.color = oscuro() ? "#eceef3" : "#222";
+      if (i === tono) o.selected = true;
+      sel.appendChild(o);
     }
-    meta.appendChild(tonos);
+    sel.onchange = () => updateDoc(ref, { tono: Number(sel.value) }).catch(alertar);
+    meta.appendChild(sel);
   }
   card.appendChild(meta);
 

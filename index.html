@@ -14,10 +14,7 @@
 <body>
   <header>
     <h1>ToDoTasks</h1>
-    <div class="acciones">
-      <button id="btn-tema" type="button">☀️ Claro</button>
-      <button id="btn-salir" type="button" hidden>Salir</button>
-    </div>
+    <button id="btn-tema" type="button">☀️ Claro</button>
   </header>
 
   <section id="pantalla-login" class="centrado" hidden>
@@ -25,39 +22,74 @@
     <button id="btn-login" type="button">Entrar con Google</button>
   </section>
 
-  <main id="pantalla-app" hidden>
-    <form id="form-tarea" class="nueva-tarea">
-      <input id="titulo" placeholder="Nueva tarea" required>
-      <select id="categoria" required></select>
-      <input id="deadline" type="datetime-local" title="Deadline (hora de Santiago, opcional)">
-      <button id="btn-agregar" type="submit">Agregar</button>
-    </form>
+  <div id="pantalla-app" class="layout" hidden>
+    <aside class="barra">
+      <label class="nav-item">
+        <input id="chk-todas" type="checkbox">
+        <span class="nombre">Todas las tareas</span>
+        <span id="cnt-todas" class="conteo">0</span>
+      </label>
 
-    <div class="orden-bar">
-      <label for="orden">Ordenar por</label>
-      <select id="orden">
-        <option value="creada">Más recientes</option>
-        <option value="deadline">Deadline (próximo primero)</option>
-      </select>
-    </div>
+      <div class="nav-seccion">Categorías</div>
+      <nav id="nav-categorias"></nav>
 
-    <div id="lista"></div>
+      <button id="btn-crear-cat" class="nav-accion" type="button">
+        <span class="icono">+</span><span>Crear categoría</span>
+      </button>
+      <button id="btn-modificar-cat" class="nav-accion" type="button">
+        <span class="icono">✎</span><span>Modificar categorías</span>
+      </button>
 
-    <details class="panel" id="panel-categorias" open>
-      <summary>Categorías</summary>
-      <div id="lista-categorias"></div>
-      <form id="form-categoria" class="nueva-categoria">
-        <input id="cat-nombre" placeholder="Nueva categoría" maxlength="30" required>
-        <div id="cat-swatches"></div>
-        <button type="submit">Crear categoría</button>
+      <button id="nav-papelera" class="nav-item" type="button">
+        <span class="icono">🗑</span>
+        <span class="nombre">Papelera</span>
+        <span id="cnt-papelera" class="conteo">0</span>
+      </button>
+    </aside>
+
+    <main>
+      <h2 id="titulo-vista">Todas las tareas</h2>
+
+      <form id="form-tarea" class="nueva-tarea">
+        <input id="titulo" placeholder="Nueva tarea" required>
+        <select id="categoria" required></select>
+        <input id="deadline" type="datetime-local" title="Deadline (hora de Santiago, opcional)">
+        <button id="btn-agregar" type="submit">Agregar</button>
       </form>
-    </details>
 
-    <details class="panel" id="panel-papelera">
-      <summary>Papelera de categorías</summary>
-      <div id="lista-papelera"></div>
-    </details>
-  </main>
+      <div id="barra-orden" class="orden-bar">
+        <label for="orden">Ordenar por</label>
+        <select id="orden">
+          <option value="deadline">Deadline (próximo primero)</option>
+          <option value="creada">Más recientes</option>
+        </select>
+      </div>
+
+      <div id="lista"></div>
+    </main>
+  </div>
+
+  <!-- Crear categoría -->
+  <dialog id="dlg-crear">
+    <h3>Nueva categoría</h3>
+    <form id="form-categoria" class="nueva-categoria">
+      <input id="cat-nombre" placeholder="Nombre" maxlength="30" required>
+      <div id="cat-swatches"></div>
+      <div class="dlg-acciones">
+        <button id="btn-cancelar-cat" class="secundario" type="button">Cancelar</button>
+        <button type="submit">Crear</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modificar categorías (la papelera está en la barra lateral) -->
+  <dialog id="dlg-modificar">
+    <h3>Modificar categorías</h3>
+    <div id="lista-categorias"></div>
+    <div class="dlg-acciones">
+      <button id="btn-cerrar-mod" type="button">Cerrar</button>
+    </div>
+  </dialog>
 
   <script type="module" src="app.js"></script>
 </body>

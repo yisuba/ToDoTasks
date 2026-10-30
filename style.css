@@ -13,6 +13,8 @@
   --peligro: #e5484d;
   --gris: #5c6170;
   --badge: rgba(255, 255, 255, 0.12);
+  --activo: rgba(109, 141, 255, 0.25);
+  --hover: rgba(255, 255, 255, 0.06);
 }
 
 [data-tema="claro"] {
@@ -29,6 +31,8 @@
   --peligro: #e5484d;
   --gris: #8a8f9c;
   --badge: rgba(0, 0, 0, 0.08);
+  --activo: #d3e3fd;
+  --hover: rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; }
@@ -40,7 +44,7 @@ body {
   padding: 0 16px 40px;
   background: var(--bg);
   color: var(--texto);
-  max-width: 700px;
+  max-width: 1100px;
   margin-inline: auto;
 }
 
@@ -52,7 +56,6 @@ header {
   padding: 16px 0;
 }
 h1 { margin: 0; font-size: 1.6rem; }
-.acciones { display: flex; gap: 8px; }
 
 .centrado { text-align: center; margin-top: 60px; }
 
@@ -68,6 +71,7 @@ button {
 button:disabled { opacity: 0.5; cursor: default; }
 button.peligro { background: var(--peligro); color: #fff; }
 button.pequeno { padding: 2px 8px; background: var(--gris); color: #fff; }
+button.secundario { background: var(--gris); color: #fff; }
 
 input, select {
   padding: 8px;
@@ -78,14 +82,71 @@ input, select {
   color: var(--texto);
 }
 
-/* Formulario de nueva tarea */
+/* ---------- Diseño con barra lateral ---------- */
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.barra {
+  width: 240px;
+  flex: 0 0 240px;
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item,
+.nav-accion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--texto);
+  padding: 10px 16px;
+  border-radius: 0 24px 24px 0;
+  font-size: 0.95rem;
+}
+.nav-item:hover,
+.nav-accion:hover { background: var(--hover); }
+.nav-item.activo { background: var(--activo); font-weight: 600; }
+
+.nav-item .nombre,
+.nav-accion span:last-child { flex: 1; }
+.nav-item .conteo { font-size: 0.8rem; color: var(--muted); }
+.nav-item.activo .conteo { color: var(--texto); }
+.icono { width: 18px; text-align: center; }
+
+.punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 12px;
+}
+
+.nav-seccion {
+  margin: 18px 16px 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+main { flex: 1; min-width: 0; }
+main h2 { margin: 0 0 12px; font-size: 1.3rem; }
+
+/* ---------- Formularios de tareas ---------- */
 .nueva-tarea {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 12px;
 }
-.nueva-tarea #titulo { flex: 1 1 180px; }
+.nueva-tarea #titulo { flex: 1 1 200px; }
 
 .orden-bar {
   display: flex;
@@ -97,7 +158,9 @@ input, select {
   color: var(--muted);
 }
 
-/* Tarjetas de tareas */
+.vacio { text-align: center; margin-top: 40px; }
+
+/* ---------- Tarjetas de tareas ---------- */
 .tarea {
   background: var(--tarea-bg, var(--tarjeta));
   border-radius: 10px;
@@ -136,20 +199,12 @@ input, select {
 .meta .vencida-txt { color: var(--peligro); font-weight: 600; }
 .meta input { font-size: 0.85rem; padding: 3px 6px; }
 
-.tonos, .swatches {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
+.tono-select {
+  font-size: 0.85rem;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--borde);
 }
-.swatch {
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border-radius: 50%;
-  border: 2px solid transparent;
-}
-.swatch.activo { border-color: var(--texto); }
 
 .anotacion {
   display: flex;
@@ -170,14 +225,40 @@ input, select {
 }
 .nueva-anotacion input { flex: 1; }
 
-/* Paneles de categorías y papelera */
-.panel {
+/* ---------- Diálogos de categorías ---------- */
+dialog {
   background: var(--tarjeta);
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-top: 20px;
+  color: var(--texto);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  width: min(560px, calc(100% - 32px));
+  padding: 20px;
 }
-.panel summary { cursor: pointer; font-weight: 600; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
+dialog h3 { margin: 12px 0 6px; font-size: 1rem; }
+dialog h3:first-child { margin-top: 0; }
+
+.dlg-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.swatches {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.swatch.activo { border-color: var(--texto); }
 
 .cat-fila {
   display: flex;
@@ -187,13 +268,46 @@ input, select {
   margin: 10px 0;
 }
 .cat-fila input[type="text"] { flex: 1 1 140px; }
+.nombre-papelera { flex: 1; }
 .muted { color: var(--muted); }
 
 .nueva-categoria {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  margin-top: 12px;
+  flex-direction: column;
+  gap: 12px;
 }
-.nueva-categoria input { flex: 1 1 160px; }
+
+/* ---------- Móvil: la barra pasa arriba, en horizontal ---------- */
+@media (max-width: 700px) {
+  .layout { flex-direction: column; gap: 8px; }
+  .barra {
+    width: 100%;
+    flex: none;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .nav-seccion { width: 100%; margin: 8px 0 0 4px; }
+  #nav-categorias { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+  .nav-item,
+  .nav-accion { width: auto; border-radius: 24px; padding: 8px 14px; }
+  .nav-item .conteo { margin-left: 4px; }
+}
+
+/* ---------- Ajustes: casillas en la barra y vista de papelera ---------- */
+label.nav-item { cursor: pointer; }
+label.nav-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: 0 0 16px;
+  accent-color: var(--acento);
+  cursor: pointer;
+}
+.papelera-cats { margin-bottom: 16px; }
+.papelera-cats .cat-fila {
+  background: var(--tarjeta);
+  border-radius: 10px;
+  padding: 10px 14px;
+}

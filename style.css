@@ -391,7 +391,12 @@ main h2 { margin-top: 8px; }
 
 @media (max-width: 700px) {
   .layout { gap: 0; }
-  .barra { padding: 0; }
+  .barra {
+    width: 100%;
+    flex: none;
+    position: relative;
+    padding: 0;
+  }
   main { padding: 0 16px; }
 }
 

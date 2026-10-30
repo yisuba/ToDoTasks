@@ -147,6 +147,7 @@ $("btn-login").onclick = () => signInWithPopup(auth, provider).catch(e => alert(
 onAuthStateChanged(auth, user => {
   $("pantalla-login").hidden = !!user;
   $("pantalla-app").hidden = !user;
+  $("btn-menu").hidden = !user;
   unsubs.forEach(f => f());
   unsubs = [];
   if (user) {
@@ -254,6 +255,8 @@ $("chk-todas").onchange = () => {
   render();
 };
 $("nav-papelera").onclick = () => { vista = "papelera"; render(); };
+$("titulo-app").onclick = () => { ocultas = new Set(); vista = "tareas"; render(); };
+$("btn-menu").onclick = () => { const c = $("contenido-barra"); c.hidden = !c.hidden; };
 $("btn-crear-cat").onclick = () => { renderFormCategoria(); $("dlg-crear").showModal(); };
 $("btn-cancelar-cat").onclick = () => $("dlg-crear").close();
 $("btn-modificar-cat").onclick = () => $("dlg-modificar").showModal();

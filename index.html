@@ -13,7 +13,10 @@
 </head>
 <body>
   <header>
-    <h1>ToDoTasks</h1>
+    <div class="izquierda">
+      <button id="btn-menu" class="menu" type="button" title="Mostrar u ocultar el menú" hidden>☰</button>
+      <h1 id="titulo-app" title="Ir a todas las tareas">ToDoTasks</h1>
+    </div>
     <button id="btn-tema" type="button">☀️ Claro</button>
   </header>
 
@@ -24,27 +27,29 @@
 
   <div id="pantalla-app" class="layout" hidden>
     <aside class="barra">
-      <label class="nav-item">
-        <input id="chk-todas" type="checkbox">
-        <span class="nombre">Todas las tareas</span>
-        <span id="cnt-todas" class="conteo">0</span>
-      </label>
+      <div id="contenido-barra">
+        <label class="nav-item">
+          <input id="chk-todas" type="checkbox">
+          <span class="nombre">Todas las tareas</span>
+          <span id="cnt-todas" class="conteo">0</span>
+        </label>
 
-      <div class="nav-seccion">Categorías</div>
-      <nav id="nav-categorias"></nav>
+        <div class="nav-seccion">Categorías</div>
+        <nav id="nav-categorias"></nav>
 
-      <button id="btn-crear-cat" class="nav-accion" type="button">
-        <span class="icono">+</span><span>Crear categoría</span>
-      </button>
-      <button id="btn-modificar-cat" class="nav-accion" type="button">
-        <span class="icono">✎</span><span>Modificar categorías</span>
-      </button>
+        <button id="btn-crear-cat" class="nav-accion" type="button">
+          <span class="icono">+</span><span>Crear categoría</span>
+        </button>
+        <button id="btn-modificar-cat" class="nav-accion" type="button">
+          <span class="icono">✎</span><span>Modificar categorías</span>
+        </button>
 
-      <button id="nav-papelera" class="nav-item" type="button">
-        <span class="icono">🗑</span>
-        <span class="nombre">Papelera</span>
-        <span id="cnt-papelera" class="conteo">0</span>
-      </button>
+        <button id="nav-papelera" class="nav-item" type="button">
+          <span class="icono">🗑</span>
+          <span class="nombre">Papelera</span>
+          <span id="cnt-papelera" class="conteo">0</span>
+        </button>
+      </div>
     </aside>
 
     <main>

@@ -47,6 +47,7 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 - Nunca insertar datos del usuario con `innerHTML`: usar `el()` con `textContent`.
 - Los errores de Firestore se muestran con `alertar`.
 - No hacer commit ni push sin que lo pida el usuario. Los cambios se publican desde GitHub Desktop.
+- Después de cada implementación pedida, responder en este orden: (1) lo entendido, resumido; (2) preguntas o propuestas, solo si hay ambigüedad; (3) al final: ¿QUIERES QUE HAGA COMMIT Y PUSH A MAIN? Antes de pedir permiso de borrado en la carpeta: ¿QUIERES QUE PIDA PERMISO DE BORRADO EN LA CARPETA? Ver `claude/preferencias-de-trabajo.md` en el proyecto de Claude.
 
 ## Pendientes y limitaciones conocidas
 

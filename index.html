@@ -68,10 +68,10 @@
       <h2 id="titulo-vista">Todas las tareas</h2>
 
       <form id="form-tarea" class="nueva-tarea">
-        <input id="titulo" placeholder="Nueva tarea" required>
         <select id="categoria" required></select>
-        <input id="deadline" type="datetime-local" title="Deadline (hora de Santiago, opcional)">
-        <button id="btn-agregar" type="submit">Agregar</button>
+        <input id="titulo" placeholder="Nueva tarea" required>
+        <label class="cal-btn" title="Deadline (hora de Santiago, opcional)">📅<input id="deadline" class="overlay-fecha" type="datetime-local"></label>
+        <button id="btn-agregar" type="submit" title="Agregar tarea" aria-label="Agregar tarea">+</button>
       </form>
 
       <hr class="separador">

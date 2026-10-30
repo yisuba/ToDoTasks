@@ -147,6 +147,7 @@ main h2 { margin: 0 0 12px; font-size: 1.3rem; }
   margin-bottom: 12px;
 }
 .nueva-tarea #titulo { flex: 1 1 200px; }
+.nueva-tarea #btn-agregar { font-size: 1.3rem; font-weight: 600; line-height: 1; padding: 8px 16px; }
 
 .orden-bar {
   display: flex;
@@ -187,17 +188,81 @@ main h2 { margin: 0 0 12px; font-size: 1.3rem; }
 }
 .categoria.sin { background: var(--gris); color: #fff; }
 
-.meta {
+.titulo-bloque {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 8px 0 0 28px;
-  font-size: 0.85rem;
-  color: var(--muted);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
-.meta .vencida-txt { color: var(--peligro); font-weight: 600; }
-.meta input { font-size: 0.85rem; padding: 3px 6px; }
+.titulo-bloque .titulo { flex: none; }
+
+.fecha-grupo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.vence { font-size: 0.85rem; font-weight: 600; color: var(--texto); }
+.vence.vencida-txt { color: var(--peligro); }
+
+/* Calendario: solo el icono, con un campo de fecha invisible encima para abrir el selector */
+.cal-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  background: var(--input);
+  color: var(--texto);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.overlay-fecha {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+.fecha-wrap { position: relative; display: inline-flex; }
+
+/* Menús flotantes (tono y calendario) */
+.menu-flotante {
+  position: absolute;
+  top: 30px;
+  z-index: 10;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+.fecha-menu {
+  right: 0;
+  min-width: 190px;
+  padding: 6px;
+}
+.fecha-op {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--texto);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+.fecha-op:hover { background: var(--hover); }
 
 .tono-wrap { position: relative; display: inline-flex; }
 .tono-btn {

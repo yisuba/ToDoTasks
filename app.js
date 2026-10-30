@@ -43,13 +43,15 @@ const oscuro = () => tema === "oscuro";
 // Tonos de una misma familia: mismo matiz, distinta luminosidad (más amplia que antes)
 function colorTono(hue, tono, esOscuro) {
   return esOscuro
-    ? `hsl(${hue} 30% ${18 + tono * 3.5}%)`
-    : `hsl(${hue} 60% ${94 - tono * 5}%)`;
+    ? `hsl(${hue} 55% ${24 + tono * 3}%)`
+    : `hsl(${hue} 80% ${92 - tono * 4}%)`;
 }
 
-// Cierra los menús de tono al hacer clic fuera de ellos
-document.addEventListener("click", () => {
-  document.querySelectorAll(".tono-menu").forEach(m => { m.hidden = true; });
+// Cierra los menús flotantes (tono y calendario) al hacer clic fuera de su contenedor
+document.addEventListener("click", e => {
+  document.querySelectorAll(".menu-flotante").forEach(m => {
+    if (!m.parentElement.contains(e.target)) m.hidden = true;
+  });
 });
 
 // ---------- Fechas (siempre hora de Santiago) ----------
@@ -489,6 +491,72 @@ function renderVista() {
   mostrar.forEach(t => lista.appendChild(crearTarjeta(t)));
 }
 
+// Círculo con el tono actual; al hacer clic despliega la gama de colores
+function selectorTono(cat, tono, ref) {
+  const wrap = el("div", "tono-wrap");
+  const btn = el("button", "tono-btn");
+  btn.type = "button";
+  btn.title = "Tono de la tarea";
+  btn.style.background = colorTono(cat.hue, tono, oscuro());
+
+  const menu = el("div", "menu-flotante tono-menu");
+  menu.hidden = true;
+  for (let i = 0; i < TONOS; i++) {
+    const op = el("button", i === tono ? "tono-op actual" : "tono-op");
+    op.type = "button";
+    op.style.background = colorTono(cat.hue, i, oscuro());
+    op.onclick = () => {
+      if (i !== tono) updateDoc(ref, { tono: i }).catch(alertar);
+    };
+    menu.appendChild(op);
+  }
+
+  btn.onclick = e => {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+  };
+
+  wrap.append(btn, menu);
+  return wrap;
+}
+
+// Calendario: despliega "Cambiar fecha" y, si hay deadline, "Quitar deadline"
+function selectorFecha(t, ref) {
+  const wrap = el("div", "fecha-wrap");
+  const btn = el("button", "cal-btn", "📅");
+  btn.type = "button";
+  btn.title = "Deadline";
+
+  const menu = el("div", "menu-flotante fecha-menu");
+  menu.hidden = true;
+
+  const cambiar = el("label", "fecha-op", "Cambiar fecha");
+  const inp = el("input", "overlay-fecha");
+  inp.type = "datetime-local";
+  inp.title = "Deadline (hora de Santiago)";
+  inp.value = t.deadline ? aInputSantiago(t.deadline) : "";
+  inp.onchange = () => {
+    updateDoc(ref, { deadline: inp.value ? santiagoAUTC(inp.value) : null }).catch(alertar);
+  };
+  cambiar.appendChild(inp);
+  menu.appendChild(cambiar);
+
+  if (t.deadline) {
+    const quitar = el("button", "fecha-op", "Quitar deadline");
+    quitar.type = "button";
+    quitar.onclick = () => updateDoc(ref, { deadline: null }).catch(alertar);
+    menu.appendChild(quitar);
+  }
+
+  btn.onclick = e => {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+  };
+
+  wrap.append(btn, menu);
+  return wrap;
+}
+
 function crearTarjeta(t) {
   const ref = refTarea(t.id);
   const cat = categorias.find(c => c.id === t.categoriaId);
@@ -498,7 +566,7 @@ function crearTarjeta(t) {
   const card = el("div", "tarea" + (t.hecha ? " hecha" : "") + (vencida ? " vencida" : ""));
   if (cat) card.style.setProperty("--tarea-bg", colorTono(cat.hue, tono, oscuro()));
 
-  // Encabezado: check, título, categoría, eliminar
+  // Encabezado: check, tono, título con categoría debajo, vence y calendario, eliminar
   const top = el("div", "tarea-top");
   const check = el("input");
   check.type = "checkbox";
@@ -510,69 +578,24 @@ function crearTarjeta(t) {
   let badgeTexto = "Sin categoría";
   if (cat) badgeTexto = cat.nombre + (cat.eliminada ? " (papelera)" : "");
   const badge = el("span", "categoria" + (cat ? "" : " sin"), badgeTexto);
+  const bloqueTitulo = el("div", "titulo-bloque");
+  bloqueTitulo.append(titulo, badge);
+
+  const txtFecha = t.deadline
+    ? (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline)
+    : "Sin deadline";
+  const fecha = el("div", "fecha-grupo");
+  fecha.append(el("span", "vence" + (vencida ? " vencida-txt" : ""), txtFecha), selectorFecha(t, ref));
 
   const borrar = el("button", "peligro", "🗑");
   borrar.onclick = () => {
     if (confirm("¿Eliminar esta tarea?")) deleteDoc(ref).catch(alertar);
   };
 
-  top.append(check, titulo, badge, borrar);
+  top.append(check);
+  if (cat) top.appendChild(selectorTono(cat, tono, ref));
+  top.append(bloqueTitulo, fecha, borrar);
   card.appendChild(top);
-
-  // Deadline y tono
-  const meta = el("div", "meta");
-  if (t.deadline) {
-    const txt = (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline);
-    meta.appendChild(el("span", vencida ? "vencida-txt" : "", txt));
-  } else {
-    meta.appendChild(el("span", "", "Sin deadline"));
-  }
-
-  const inpFecha = el("input");
-  inpFecha.type = "datetime-local";
-  inpFecha.title = "Deadline (hora de Santiago)";
-  inpFecha.value = t.deadline ? aInputSantiago(t.deadline) : "";
-  inpFecha.onchange = () => {
-    updateDoc(ref, { deadline: inpFecha.value ? santiagoAUTC(inpFecha.value) : null }).catch(alertar);
-  };
-  meta.appendChild(inpFecha);
-
-  if (t.deadline) {
-    const quitarFecha = el("button", "pequeno", "✕");
-    quitarFecha.title = "Quitar deadline";
-    quitarFecha.onclick = () => updateDoc(ref, { deadline: null }).catch(alertar);
-    meta.appendChild(quitarFecha);
-  }
-
-  if (cat) {
-    // Círculo con el tono actual; al hacer clic despliega la gama de colores
-    const wrap = el("div", "tono-wrap");
-    const btn = el("button", "tono-btn");
-    btn.type = "button";
-    btn.title = "Tono de la tarea";
-    btn.style.background = colorTono(cat.hue, tono, oscuro());
-
-    const menu = el("div", "tono-menu");
-    menu.hidden = true;
-    for (let i = 0; i < TONOS; i++) {
-      const op = el("button", i === tono ? "tono-op actual" : "tono-op");
-      op.type = "button";
-      op.style.background = colorTono(cat.hue, i, oscuro());
-      op.onclick = () => {
-        if (i !== tono) updateDoc(ref, { tono: i }).catch(alertar);
-      };
-      menu.appendChild(op);
-    }
-
-    btn.onclick = e => {
-      e.stopPropagation();
-      menu.hidden = !menu.hidden;
-    };
-
-    wrap.append(btn, menu);
-    meta.appendChild(wrap);
-  }
-  card.appendChild(meta);
 
   // Anotaciones
   const notas = t.anotaciones || [];

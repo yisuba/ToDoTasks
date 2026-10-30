@@ -71,7 +71,7 @@
       <form id="form-tarea" class="nueva-tarea">
         <select id="categoria" required></select>
         <input id="titulo" placeholder="Nueva tarea" required>
-        <label class="cal-btn" title="Deadline (hora de Santiago, opcional)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><input id="deadline" class="overlay-fecha" type="datetime-local"></label>
+        <label class="cal-btn" title="Deadline (opcional)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><input id="deadline" class="overlay-fecha" type="datetime-local"></label>
         <button id="btn-agregar" type="submit" title="Agregar tarea" aria-label="Agregar tarea">+</button>
       </form>
 
@@ -80,7 +80,7 @@
       <div id="barra-orden" class="orden-bar">
         <label for="orden">Ordenar por</label>
         <select id="orden">
-          <option value="deadline">Deadline (próximo primero)</option>
+          <option value="deadline">(Próximo primero)</option>
           <option value="creada">Más recientes</option>
         </select>
       </div>

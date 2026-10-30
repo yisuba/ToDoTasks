@@ -1,33 +1,62 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-tema="oscuro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ToDoTasks</title>
+  <script>
+    // Aplica el tema guardado en este dispositivo antes de pintar la página (evita parpadeo)
+    try { document.documentElement.dataset.tema = localStorage.getItem("todotasks-tema") === "claro" ? "claro" : "oscuro"; }
+    catch (e) { document.documentElement.dataset.tema = "oscuro"; }
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>ToDoTasks</h1>
-    <button id="btn-salir" hidden>Salir</button>
+    <div class="acciones">
+      <button id="btn-tema" type="button">☀️ Claro</button>
+      <button id="btn-salir" type="button" hidden>Salir</button>
+    </div>
   </header>
 
   <section id="pantalla-login" class="centrado" hidden>
     <p>Inicia sesión para ver tus tareas.</p>
-    <button id="btn-login">Entrar con Google</button>
+    <button id="btn-login" type="button">Entrar con Google</button>
   </section>
 
   <main id="pantalla-app" hidden>
     <form id="form-tarea" class="nueva-tarea">
       <input id="titulo" placeholder="Nueva tarea" required>
-      <select id="categoria">
-        <option>Universidad</option>
-        <option>Personal</option>
-        <option>Proyectos</option>
-      </select>
-      <button type="submit">Agregar</button>
+      <select id="categoria" required></select>
+      <input id="deadline" type="datetime-local" title="Deadline (hora de Santiago, opcional)">
+      <button id="btn-agregar" type="submit">Agregar</button>
     </form>
+
+    <div class="orden-bar">
+      <label for="orden">Ordenar por</label>
+      <select id="orden">
+        <option value="creada">Más recientes</option>
+        <option value="deadline">Deadline (próximo primero)</option>
+      </select>
+    </div>
+
     <div id="lista"></div>
+
+    <details class="panel" id="panel-categorias" open>
+      <summary>Categorías</summary>
+      <div id="lista-categorias"></div>
+      <form id="form-categoria" class="nueva-categoria">
+        <input id="cat-nombre" placeholder="Nueva categoría" maxlength="30" required>
+        <div id="cat-swatches"></div>
+        <button type="submit">Crear categoría</button>
+      </form>
+    </details>
+
+    <details class="panel" id="panel-papelera">
+      <summary>Papelera de categorías</summary>
+      <div id="lista-papelera"></div>
+    </details>
   </main>
 
   <script type="module" src="app.js"></script>

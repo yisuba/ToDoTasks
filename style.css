@@ -1,11 +1,45 @@
+/* Colores por tema: oscuro por defecto; [data-tema="claro"] en <html> lo cambia */
+:root {
+  color-scheme: dark;
+  --bg: #15161a;
+  --texto: #eceef3;
+  --tarjeta: #1f2127;
+  --borde: #3a3e4a;
+  --muted: #9097a6;
+  --acento: #6d8dff;
+  --acento-txt: #0d1020;
+  --anot: #2a2d36;
+  --input: #1b1d22;
+  --peligro: #e5484d;
+  --gris: #5c6170;
+  --badge: rgba(255, 255, 255, 0.12);
+}
+
+[data-tema="claro"] {
+  color-scheme: light;
+  --bg: #f4f5f7;
+  --texto: #222;
+  --tarjeta: #fff;
+  --borde: #ccc;
+  --muted: #6b7080;
+  --acento: #3b6cf6;
+  --acento-txt: #fff;
+  --anot: #f3f4f7;
+  --input: #fff;
+  --peligro: #e5484d;
+  --gris: #8a8f9c;
+  --badge: rgba(0, 0, 0, 0.08);
+}
+
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   font-family: system-ui, sans-serif;
   margin: 0;
   padding: 0 16px 40px;
-  background: #f4f5f7;
-  color: #222;
+  background: var(--bg);
+  color: var(--texto);
   max-width: 700px;
   margin-inline: auto;
 }
@@ -14,10 +48,11 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   padding: 16px 0;
 }
-
 h1 { margin: 0; font-size: 1.6rem; }
+.acciones { display: flex; gap: 8px; }
 
 .centrado { text-align: center; margin-top: 60px; }
 
@@ -25,54 +60,96 @@ button {
   padding: 8px 14px;
   border: none;
   border-radius: 6px;
-  background: #3b6cf6;
-  color: #fff;
+  background: var(--acento);
+  color: var(--acento-txt);
   cursor: pointer;
   font-size: 0.95rem;
 }
-
-button.peligro { background: #e5484d; }
-button.pequeno { padding: 2px 8px; background: #888; }
+button:disabled { opacity: 0.5; cursor: default; }
+button.peligro { background: var(--peligro); color: #fff; }
+button.pequeno { padding: 2px 8px; background: var(--gris); color: #fff; }
 
 input, select {
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--borde);
   border-radius: 6px;
   font-size: 1rem;
+  background: var(--input);
+  color: var(--texto);
 }
 
+/* Formulario de nueva tarea */
 .nueva-tarea {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
-.nueva-tarea input { flex: 1 1 180px; }
+.nueva-tarea #titulo { flex: 1 1 180px; }
 
+.orden-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Tarjetas de tareas */
 .tarea {
-  background: #fff;
+  background: var(--tarea-bg, var(--tarjeta));
   border-radius: 10px;
   padding: 12px 14px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
+.tarea.vencida { outline: 2px solid var(--peligro); }
 
 .tarea-top {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
-.tarea-top .titulo { flex: 1; font-weight: 600; word-break: break-word; }
-.tarea.hecha .titulo { text-decoration: line-through; color: #999; }
+.titulo { flex: 1; font-weight: 600; word-break: break-word; }
+.tarea.hecha .titulo { text-decoration: line-through; color: var(--muted); }
 
 .categoria {
   font-size: 0.75rem;
-  background: #e8edff;
-  color: #3b6cf6;
+  background: var(--badge);
   padding: 2px 8px;
   border-radius: 99px;
+  white-space: nowrap;
 }
+.categoria.sin { background: var(--gris); color: #fff; }
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0 28px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.meta .vencida-txt { color: var(--peligro); font-weight: 600; }
+.meta input { font-size: 0.85rem; padding: 3px 6px; }
+
+.tonos, .swatches {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.swatch.activo { border-color: var(--texto); }
 
 .anotacion {
   display: flex;
@@ -81,15 +158,42 @@ input, select {
   gap: 8px;
   margin: 8px 0 0 28px;
   padding: 6px 10px;
-  background: #f7f7f9;
+  background: var(--anot);
   border-radius: 6px;
   font-size: 0.92rem;
   word-break: break-word;
 }
-
 .nueva-anotacion {
   display: flex;
   gap: 6px;
   margin: 10px 0 0 28px;
 }
 .nueva-anotacion input { flex: 1; }
+
+/* Paneles de categorías y papelera */
+.panel {
+  background: var(--tarjeta);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 20px;
+}
+.panel summary { cursor: pointer; font-weight: 600; }
+
+.cat-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+.cat-fila input[type="text"] { flex: 1 1 140px; }
+.muted { color: var(--muted); }
+
+.nueva-categoria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.nueva-categoria input { flex: 1 1 160px; }

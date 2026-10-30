@@ -353,3 +353,33 @@ main h2 { margin-top: 8px; }
   .barra { padding: 0; }
   main { padding: 0 16px; }
 }
+
+/* ---------- Secciones desplegables, separadores y orden a la izquierda ---------- */
+.nav-seccion-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 16px 6px;
+  border-radius: 0 24px 24px 0;
+}
+.nav-seccion-btn:hover { background: var(--hover); }
+
+.separador {
+  border: 0;
+  border-top: 1px solid var(--borde);
+  margin: 10px 16px;
+}
+main .separador { margin: 12px 0; }
+
+.orden-bar { justify-content: flex-start; }
+
+.subtitulo {
+  padding: 6px 16px 2px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+#contenido-config .nav-item { padding-left: 24px; }

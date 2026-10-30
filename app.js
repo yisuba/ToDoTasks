@@ -131,15 +131,27 @@ function aplicarTema(t) {
   tema = t;
   document.documentElement.dataset.tema = t;
   try { localStorage.setItem(TEMA_LOCAL, t); } catch {}
-  $("btn-tema").textContent = t === "oscuro" ? "☀️ Claro" : "🌙 Oscuro";
+  $("tema-oscuro").classList.toggle("activo", t === "oscuro");
+  $("tema-claro").classList.toggle("activo", t === "claro");
   render();
 }
 
-$("btn-tema").onclick = () => {
-  const nuevo = tema === "oscuro" ? "claro" : "oscuro";
-  aplicarTema(nuevo);
-  if (uid) setDoc(refPrefs(), { tema: nuevo }, { merge: true }).catch(alertar);
-};
+function elegirTema(t) {
+  aplicarTema(t);
+  if (uid) setDoc(refPrefs(), { tema: t }, { merge: true }).catch(alertar);
+}
+$("tema-oscuro").onclick = () => elegirTema("oscuro");
+$("tema-claro").onclick = () => elegirTema("claro");
+
+function alternarSeccion(contId, btnId, nombre) {
+  const c = $(contId);
+  c.hidden = !c.hidden;
+  const b = $(btnId);
+  b.textContent = (c.hidden ? "▸ " : "▾ ") + nombre;
+  b.setAttribute("aria-expanded", String(!c.hidden));
+}
+$("btn-sec-categorias").onclick = () => alternarSeccion("contenido-categorias", "btn-sec-categorias", "Categorías");
+$("btn-sec-config").onclick = () => alternarSeccion("contenido-config", "btn-sec-config", "Configuración");
 
 // ---------- Sesión ----------
 $("btn-login").onclick = () => signInWithPopup(auth, provider).catch(e => alert(e.message));

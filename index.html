@@ -17,7 +17,6 @@
       <button id="btn-menu" class="menu" type="button" title="Mostrar u ocultar el menú" hidden>☰</button>
       <h1 id="titulo-app" title="Ir a todas las tareas">ToDoTasks</h1>
     </div>
-    <button id="btn-tema" type="button">☀️ Claro</button>
   </header>
 
   <section id="pantalla-login" class="centrado" hidden>
@@ -34,21 +33,31 @@
           <span id="cnt-todas" class="conteo">0</span>
         </label>
 
-        <div class="nav-seccion">Categorías</div>
-        <nav id="nav-categorias"></nav>
-
-        <button id="btn-crear-cat" class="nav-accion" type="button">
-          <span class="icono">+</span><span>Crear categoría</span>
-        </button>
-        <button id="btn-modificar-cat" class="nav-accion" type="button">
-          <span class="icono">✎</span><span>Modificar categorías</span>
-        </button>
+        <button id="btn-sec-categorias" class="nav-seccion-btn" type="button" aria-expanded="true">▾ Categorías</button>
+        <div id="contenido-categorias">
+          <button id="btn-crear-cat" class="nav-accion" type="button">
+            <span class="icono">+</span><span>Crear categoría</span>
+          </button>
+          <nav id="nav-categorias"></nav>
+          <button id="btn-modificar-cat" class="nav-accion" type="button">
+            <span class="icono">✎</span><span>Modificar categorías</span>
+          </button>
+        </div>
 
         <button id="nav-papelera" class="nav-item" type="button">
           <span class="icono">🗑</span>
           <span class="nombre">Papelera</span>
           <span id="cnt-papelera" class="conteo">0</span>
         </button>
+
+        <hr class="separador">
+
+        <button id="btn-sec-config" class="nav-seccion-btn" type="button" aria-expanded="false">▸ Configuración</button>
+        <div id="contenido-config" hidden>
+          <div class="subtitulo">Tema</div>
+          <button id="tema-oscuro" class="nav-item" type="button"><span class="icono">🌙</span><span class="nombre">Oscuro</span></button>
+          <button id="tema-claro" class="nav-item" type="button"><span class="icono">☀️</span><span class="nombre">Claro</span></button>
+        </div>
       </div>
     </aside>
 
@@ -61,6 +70,8 @@
         <input id="deadline" type="datetime-local" title="Deadline (hora de Santiago, opcional)">
         <button id="btn-agregar" type="submit">Agregar</button>
       </form>
+
+      <hr class="separador">
 
       <div id="barra-orden" class="orden-bar">
         <label for="orden">Ordenar por</label>

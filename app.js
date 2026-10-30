@@ -619,17 +619,19 @@ function crearTarjeta(t) {
   bloqueTitulo.append(filaNombre, badge);
 
   const txtFecha = t.deadline
-    ? (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline)
+    ? (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline) + " hrs"
     : "Sin deadline";
   const fecha = el("div", "fecha-grupo");
-  fecha.append(el("span", "vence" + (vencida ? " vencida-txt" : ""), txtFecha), selectorFecha(t, ref));
+  fecha.append(selectorFecha(t, ref), el("span", "vence" + (vencida ? " vencida-txt" : ""), txtFecha));
 
   const borrar = botonIcono(ICONO_BASURA, "peligro", "Eliminar tarea");
   borrar.onclick = () => {
     if (confirm("¿Eliminar esta tarea?")) deleteDoc(ref).catch(alertar);
   };
 
-  top.append(check, bloqueTitulo, fecha, borrar);
+  // "Vence" va debajo de la categoría, dentro de la misma columna del título
+  bloqueTitulo.appendChild(fecha);
+  top.append(check, bloqueTitulo, borrar);
   card.appendChild(top);
 
   // Anotaciones

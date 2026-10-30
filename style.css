@@ -129,6 +129,10 @@ input, select {
   flex: 0 0 12px;
 }
 
+/* Contenido de los desplegables de la barra, levemente a la derecha de su botón */
+#contenido-categorias,
+#contenido-config { padding-left: 12px; }
+
 .nav-seccion {
   margin: 18px 16px 6px;
   font-size: 0.85rem;

@@ -21,7 +21,7 @@ Todo lo del usuario vive bajo `usuarios/{uid}`:
   - `eliminada` (bool). Las categorías en papelera tienen `true`.
   - `creada` (timestamp)
 - `usuarios/{uid}/tareas/{id}`
-  - `titulo` (string), `categoriaId` (id de categoría), `tono` (0 a 4), `hecha` (bool)
+  - `titulo` (string), `categoriaId` (id de categoría), `tono` (0 a 7, índice en `TONOS`), `hecha` (bool)
   - `creada` (timestamp), `deadline` (timestamp o null)
   - `anotaciones` (array de `{ texto, fecha }`)
 - `usuarios/{uid}/ajustes/prefs`
@@ -36,7 +36,7 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 - **Barra lateral** (estilo Google Tareas): casilla "Todas las tareas" (marca o desmarca todas), una casilla por categoría con punto de color y conteo de pendientes, botones "Crear categoría" (abre `dlg-crear`) y "Modificar categorías" (abre `dlg-modificar`), y al final "Papelera" (cambia la vista principal). Todas las casillas empiezan marcadas. Las categorías desmarcadas se guardan en `ocultas` (Set en memoria): sus tareas no se muestran. Destacadas se eliminó por no tener función. El botón de cerrar sesión se quitó por ahora.
 - **Vista Papelera:** muestra las categorías en papelera (Restaurar / Eliminar definitivamente) y solo las tareas de esas categorías. Oculta el formulario de nueva tarea.
 - **Categorías por usuario, editables.** Las tareas guardan el id de categoría, así que renombrar no rompe nada. Borrar manda la categoría a la papelera (`eliminada: true`) tras confirmar. Las tareas de una categoría en papelera no aparecen en la vista normal. Al eliminar definitivamente, sus tareas quedan "Sin categoría" y se muestran en la vista normal.
-- **Tonos por tarea.** Cada tarea elige uno de 5 tonos desde un menú desplegable (`select.tono-select`) dentro del matiz de su categoría. Los colores se generan con HSL: claro usa luminosidad 90 a 70 con saturación 60; oscuro usa 24 a 36 con saturación 30. Cambiar el matiz de la categoría actualiza todas sus tareas.
+- **Tonos por tarea.** Cada tarea elige uno de 8 tonos dentro del matiz de su categoría. En la tarjeta se ve un círculo (`button.tono-btn`) con el tono actual; al hacer clic despliega una cuadrícula de 4 columnas (`.tono-menu`) solo con colores, sin números. Los colores se generan con HSL: claro usa luminosidad 94 a 59 con saturación 60; oscuro usa 18 a 42.5 con saturación 30. Cambiar el matiz de la categoría actualiza todas sus tareas.
 - **Deadline opcional, en hora de Santiago.** Se guarda como timestamp (instante UTC). Al ingresar, se convierte la hora de Santiago con `Intl` (`santiagoAUTC`). Se muestra como "Vence: sáb 7 nov, 18:00", sin sufijo. Las vencidas y no hechas tienen borde rojo.
 - **Orden predeterminado: deadline próximo primero** (dentro de cada lista, la más próxima arriba; sin deadline al final). La otra opción es "Más recientes".
 - **Migración:** `migrar()` copia las tareas de la raíz a la estructura nueva una sola vez (controlada por `migrado`).
@@ -46,8 +46,9 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 - Textos de interfaz en español.
 - Nunca insertar datos del usuario con `innerHTML`: usar `el()` con `textContent`.
 - Los errores de Firestore se muestran con `alertar`.
-- No hacer commit ni push sin que lo pida el usuario. Los cambios se publican desde GitHub Desktop.
-- Después de cada implementación pedida, responder en este orden: (1) lo entendido, resumido; (2) preguntas o propuestas, solo si hay ambigüedad; (3) al final: ¿QUIERES QUE HAGA COMMIT Y PUSH A MAIN? Antes de pedir permiso de borrado en la carpeta: ¿QUIERES QUE PIDA PERMISO DE BORRADO EN LA CARPETA? Ver `claude/preferencias-de-trabajo.md` en el proyecto de Claude.
+- No hacer commit ni push sin que lo pida el usuario en ese momento. Los cambios también se pueden publicar desde GitHub Desktop.
+- Después de cada implementación pedida, responder en este orden: (1) lo entendido, resumido; (2) preguntas o propuestas, solo si hay ambigüedad; (3) al final: ¿QUIERES QUE HAGA COMMIT Y PUSH A MAIN? Antes de pedir permiso de borrado en la carpeta: ¿QUIERES QUE PIDA PERMISO DE BORRADO EN LA CARPETA?
+- Responder siempre en español, incluido el texto visible de la interfaz.
 
 ## Pendientes y limitaciones conocidas
 

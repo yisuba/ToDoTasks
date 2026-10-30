@@ -19,7 +19,7 @@ const provider = new GoogleAuthProvider();
 // ---------- Constantes y estado ----------
 const $ = id => document.getElementById(id);
 const TZ = "America/Santiago";
-const TONOS = 5;
+const TONOS = 8;
 const HUES = [215, 150, 335, 265, 25, 50, 190, 165]; // matices pastel disponibles
 const CATEGORIAS_INICIALES = { Universidad: 215, Personal: 335, Proyectos: 150 };
 const TEMA_LOCAL = "todotasks-tema";
@@ -40,12 +40,17 @@ function leerTemaLocal() {
 const oscuro = () => tema === "oscuro";
 
 // ---------- Colores ----------
-// Tonos de una misma familia: mismo matiz, distinta luminosidad
+// Tonos de una misma familia: mismo matiz, distinta luminosidad (más amplia que antes)
 function colorTono(hue, tono, esOscuro) {
   return esOscuro
-    ? `hsl(${hue} 30% ${24 + tono * 3}%)`
-    : `hsl(${hue} 60% ${90 - tono * 5}%)`;
+    ? `hsl(${hue} 30% ${18 + tono * 3.5}%)`
+    : `hsl(${hue} 60% ${94 - tono * 5}%)`;
 }
+
+// Cierra los menús de tono al hacer clic fuera de ellos
+document.addEventListener("click", () => {
+  document.querySelectorAll(".tono-menu").forEach(m => { m.hidden = true; });
+});
 
 // ---------- Fechas (siempre hora de Santiago) ----------
 const fmtFecha = new Intl.DateTimeFormat("es-CL", {
@@ -528,21 +533,32 @@ function crearTarjeta(t) {
   }
 
   if (cat) {
-    // Menú desplegable de tonos: cada opción muestra su color
-    const sel = el("select", "tono-select");
-    sel.title = "Tono de la tarea";
-    sel.style.background = colorTono(cat.hue, tono, oscuro());
-    sel.style.color = oscuro() ? "#eceef3" : "#222";
+    // Círculo con el tono actual; al hacer clic despliega la gama de colores
+    const wrap = el("div", "tono-wrap");
+    const btn = el("button", "tono-btn");
+    btn.type = "button";
+    btn.title = "Tono de la tarea";
+    btn.style.background = colorTono(cat.hue, tono, oscuro());
+
+    const menu = el("div", "tono-menu");
+    menu.hidden = true;
     for (let i = 0; i < TONOS; i++) {
-      const o = el("option", "", `Tono ${i + 1}`);
-      o.value = String(i);
-      o.style.background = colorTono(cat.hue, i, oscuro());
-      o.style.color = oscuro() ? "#eceef3" : "#222";
-      if (i === tono) o.selected = true;
-      sel.appendChild(o);
+      const op = el("button", i === tono ? "tono-op actual" : "tono-op");
+      op.type = "button";
+      op.style.background = colorTono(cat.hue, i, oscuro());
+      op.onclick = () => {
+        if (i !== tono) updateDoc(ref, { tono: i }).catch(alertar);
+      };
+      menu.appendChild(op);
     }
-    sel.onchange = () => updateDoc(ref, { tono: Number(sel.value) }).catch(alertar);
-    meta.appendChild(sel);
+
+    btn.onclick = e => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+    };
+
+    wrap.append(btn, menu);
+    meta.appendChild(wrap);
   }
   card.appendChild(meta);
 

@@ -199,12 +199,38 @@ main h2 { margin: 0 0 12px; font-size: 1.3rem; }
 .meta .vencida-txt { color: var(--peligro); font-weight: 600; }
 .meta input { font-size: 0.85rem; padding: 3px 6px; }
 
-.tono-select {
-  font-size: 0.85rem;
-  padding: 3px 6px;
-  border-radius: 6px;
-  border: 1px solid var(--borde);
+.tono-wrap { position: relative; display: inline-flex; }
+.tono-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--borde);
+  cursor: pointer;
 }
+.tono-menu {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(4, 28px);
+  gap: 8px;
+  padding: 10px;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+.tono-op {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.tono-op.actual { border-color: var(--texto); }
 
 .anotacion {
   display: flex;

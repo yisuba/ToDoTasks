@@ -21,6 +21,7 @@ Este archivo es el contexto de trabajo: mantenerlo al día cuando cambie algo im
 - `index.html`: estructura. Cabecera con el título (clicable) y el botón ☰; layout con barra lateral (`aside.barra`) y contenido principal (`main`); dos `<dialog>`: `dlg-crear` (nueva categoría) y `dlg-modificar` (editar categorías). Incluye un pequeño script en `<head>` que aplica el tema guardado antes de pintar.
 - `app.js`: toda la lógica (Firebase, render, filtro por categoría, migración). Módulo ES cargado desde `index.html`.
 - `style.css`: estilos. Colores en variables CSS en `:root` (oscuro) y `[data-tema="claro"]`. Bajo 700 px, la barra lateral pasa arriba en horizontal.
+- `favicon.png`: ícono de la pestaña del navegador (arte de Psyduck, uso personal; el repo es público).
 - No hay build, ni npm, ni dependencias locales. Firebase se carga desde gstatic.com.
 
 ## Modelo de datos (Firestore)
@@ -50,7 +51,7 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 - **Menú ☰:** muestra u oculta la barra lateral. En computador empieza abierto; en celular (700 px o menos) empieza cerrado y se abre como panel encima del contenido, y se cierra al tocar fuera. No se guarda entre recargas.
 - **Vista Papelera:** muestra las categorías en papelera (Restaurar / Eliminar definitivamente) y solo las tareas de esas categorías. Oculta el formulario de nueva tarea y la fila de orden.
 - **Categorías por usuario, editables.** Las tareas guardan el id de categoría, así que renombrar no rompe nada. Borrar manda la categoría a la papelera (`eliminada: true`) tras confirmar. Las tareas de una categoría en papelera no aparecen en la vista normal. Al eliminar definitivamente, sus tareas quedan "Sin categoría" y se muestran en la vista normal.
-- **Tonos por tarea.** Cada tarea elige uno de 8 tonos dentro del matiz de su categoría. En la tarjeta se ve un círculo (`button.tono-btn`) con el tono actual; al hacer clic despliega una cuadrícula de 4 columnas (`.tono-menu`) solo con colores, sin números. Los colores se generan con HSL: claro usa luminosidad 92 a 64 con saturación 80; oscuro usa 24 a 45 con saturación 55. Cambiar el matiz de la categoría actualiza todas sus tareas. El círculo va a la izquierda del nombre, y la categoría debajo del nombre.
+- **Tonos por tarea.** Cada tarea elige uno de 8 tonos dentro del matiz de su categoría. En la tarjeta se ve un círculo (`button.tono-btn`) con el tono actual; al hacer clic despliega una cuadrícula de 4 columnas (`.tono-menu`) solo con colores, sin números. Los colores se generan con HSL: claro usa luminosidad 92 a 64 con saturación 80; oscuro usa 24 a 45 con saturación 55. Cambiar el matiz de la categoría actualiza todas sus tareas. El círculo (con un asterisco blanco y borde blanco) va en la fila del nombre, a su derecha; la categoría va debajo del nombre.
 - **Deadline opcional, en hora de Santiago.** Se guarda como timestamp (instante UTC). Al ingresar, se convierte la hora de Santiago con `Intl` (`santiagoAUTC`). La tarjeta muestra "Vence: sáb 7 nov, 18:00" a la derecha del título, sin sufijo, seguido de un icono 📅. Ese icono despliega "Cambiar fecha" y, si hay deadline, "Quitar deadline". El formulario de nueva tarea usa el mismo icono sin texto. Las vencidas y no hechas tienen borde rojo.
 - **Orden predeterminado: deadline próximo primero** (dentro de cada lista, la más próxima arriba; sin deadline al final). La otra opción es "Más recientes". La fila "Ordenar por" va alineada a la izquierda, debajo de una línea separadora.
 - **Migración:** `migrar()` copia las tareas de la raíz a la estructura nueva una sola vez (controlada por `migrado`).
@@ -58,6 +59,7 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 ## Convenciones
 
 - Textos de interfaz en español.
+- No usar emojis en la interfaz. Los iconos van en SVG en línea (`ICONO_CALENDARIO`, `ICONO_BASURA` en app.js) o con símbolos de texto simples (☰, ✎, ✕).
 - Nunca insertar datos del usuario con `innerHTML`: usar `el()` con `textContent`.
 - Los errores de Firestore se muestran con `alertar`.
 

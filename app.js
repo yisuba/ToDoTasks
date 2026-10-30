@@ -397,7 +397,7 @@ function filaCategoria(c) {
   const sw = swatches(c.hue, h => updateDoc(refCat(c.id), { hue: h }).catch(alertar));
 
   const n = tareas.filter(t => t.categoriaId === c.id).length;
-  const borrar = el("button", "peligro pequeno", "🗑");
+  const borrar = botonIcono(ICONO_BASURA, "peligro pequeno", "Eliminar definitivamente");
   borrar.title = "Mover a la papelera";
   borrar.onclick = () => {
     let msg = `¿Mover "${c.nombre}" a la papelera?`;
@@ -491,10 +491,23 @@ function renderVista() {
   mostrar.forEach(t => lista.appendChild(crearTarjeta(t)));
 }
 
+// Iconos SVG en línea (sin emojis)
+const ICONO_CALENDARIO = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+const ICONO_BASURA = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+
+// Botón que solo muestra un icono SVG
+function botonIcono(svg, clase, titulo) {
+  const b = el("button", clase);
+  b.type = "button";
+  b.title = titulo;
+  b.innerHTML = svg;
+  return b;
+}
+
 // Círculo con el tono actual; al hacer clic despliega la gama de colores
 function selectorTono(cat, tono, ref) {
   const wrap = el("div", "tono-wrap");
-  const btn = el("button", "tono-btn");
+  const btn = el("button", "tono-btn", "*");
   btn.type = "button";
   btn.title = "Tono de la tarea";
   btn.style.background = colorTono(cat.hue, tono, oscuro());
@@ -523,9 +536,7 @@ function selectorTono(cat, tono, ref) {
 // Calendario: despliega "Cambiar fecha" y, si hay deadline, "Quitar deadline"
 function selectorFecha(t, ref) {
   const wrap = el("div", "fecha-wrap");
-  const btn = el("button", "cal-btn", "📅");
-  btn.type = "button";
-  btn.title = "Deadline";
+  const btn = botonIcono(ICONO_CALENDARIO, "cal-btn", "Deadline");
 
   const menu = el("div", "menu-flotante fecha-menu");
   menu.hidden = true;
@@ -573,13 +584,17 @@ function crearTarjeta(t) {
   check.checked = !!t.hecha;
   check.onchange = () => updateDoc(ref, { hecha: check.checked }).catch(alertar);
 
+  // Fila del nombre: título y, a su derecha, el círculo de tono
   const titulo = el("span", "titulo", t.titulo);
+  const filaNombre = el("div", "titulo-fila");
+  filaNombre.appendChild(titulo);
+  if (cat) filaNombre.appendChild(selectorTono(cat, tono, ref));
 
   let badgeTexto = "Sin categoría";
   if (cat) badgeTexto = cat.nombre + (cat.eliminada ? " (papelera)" : "");
   const badge = el("span", "categoria" + (cat ? "" : " sin"), badgeTexto);
   const bloqueTitulo = el("div", "titulo-bloque");
-  bloqueTitulo.append(titulo, badge);
+  bloqueTitulo.append(filaNombre, badge);
 
   const txtFecha = t.deadline
     ? (vencida ? "Vencida: " : "Vence: ") + fmtFecha.format(t.deadline)
@@ -587,14 +602,12 @@ function crearTarjeta(t) {
   const fecha = el("div", "fecha-grupo");
   fecha.append(el("span", "vence" + (vencida ? " vencida-txt" : ""), txtFecha), selectorFecha(t, ref));
 
-  const borrar = el("button", "peligro", "🗑");
+  const borrar = botonIcono(ICONO_BASURA, "peligro", "Eliminar tarea");
   borrar.onclick = () => {
     if (confirm("¿Eliminar esta tarea?")) deleteDoc(ref).catch(alertar);
   };
 
-  top.append(check);
-  if (cat) top.appendChild(selectorTono(cat, tono, ref));
-  top.append(bloqueTitulo, fecha, borrar);
+  top.append(check, bloqueTitulo, fecha, borrar);
   card.appendChild(top);
 
   // Anotaciones

@@ -9,6 +9,7 @@
     try { document.documentElement.dataset.tema = localStorage.getItem("todotasks-tema") === "claro" ? "claro" : "oscuro"; }
     catch (e) { document.documentElement.dataset.tema = "oscuro"; }
   </script>
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -45,7 +46,7 @@
         </div>
 
         <button id="nav-papelera" class="nav-item" type="button">
-          <span class="icono">🗑</span>
+          <span class="icono"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span>
           <span class="nombre">Papelera</span>
           <span id="cnt-papelera" class="conteo">0</span>
         </button>
@@ -70,7 +71,7 @@
       <form id="form-tarea" class="nueva-tarea">
         <select id="categoria" required></select>
         <input id="titulo" placeholder="Nueva tarea" required>
-        <label class="cal-btn" title="Deadline (hora de Santiago, opcional)">📅<input id="deadline" class="overlay-fecha" type="datetime-local"></label>
+        <label class="cal-btn" title="Deadline (hora de Santiago, opcional)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><input id="deadline" class="overlay-fecha" type="datetime-local"></label>
         <button id="btn-agregar" type="submit" title="Agregar tarea" aria-label="Agregar tarea">+</button>
       </form>
 

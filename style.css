@@ -269,10 +269,34 @@ main h2 { margin: 0 0 12px; font-size: 1.3rem; }
   width: 22px;
   height: 22px;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
-  border: 2px solid var(--borde);
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.7);
   cursor: pointer;
 }
+
+/* Fila del nombre: título y, a su derecha, el botón de tono */
+.titulo-fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.titulo-fila .titulo { min-width: 0; }
+
+/* Iconos SVG alineados dentro de sus botones */
+.cal-btn svg,
+.peligro svg,
+.pequeno svg,
+.icono svg { display: block; }
 .tono-menu {
   position: absolute;
   top: 30px;

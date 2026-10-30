@@ -271,7 +271,21 @@ $("chk-todas").onchange = () => {
 };
 $("nav-papelera").onclick = () => { vista = "papelera"; render(); };
 $("titulo-app").onclick = () => { ocultas = new Set(); vista = "tareas"; render(); };
-$("btn-menu").onclick = () => { const c = $("contenido-barra"); c.hidden = !c.hidden; };
+$("btn-menu").onclick = e => {
+  e.stopPropagation();
+  const c = $("contenido-barra");
+  c.hidden = !c.hidden;
+};
+
+// En celular la barra empieza cerrada y se abre encima del contenido; en computador empieza abierta
+const celular = window.matchMedia("(max-width: 700px)");
+$("contenido-barra").hidden = celular.matches;
+// En celular, tocar fuera de la barra la cierra
+document.addEventListener("click", e => {
+  if (celular.matches && !$("contenido-barra").hidden && !e.target.closest(".barra")) {
+    $("contenido-barra").hidden = true;
+  }
+});
 $("btn-crear-cat").onclick = () => { renderFormCategoria(); $("dlg-crear").showModal(); };
 $("btn-cancelar-cat").onclick = () => $("dlg-crear").close();
 $("btn-modificar-cat").onclick = () => $("dlg-modificar").showModal();

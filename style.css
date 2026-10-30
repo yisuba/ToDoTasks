@@ -309,10 +309,25 @@ dialog h3:first-child { margin-top: 0; }
   .barra {
     width: 100%;
     flex: none;
-    position: static;
+    position: relative;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 6px;
+  }
+  /* En celular, la barra se abre como panel encima del contenido */
+  #contenido-barra {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    padding: 8px 12px;
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    max-height: 70vh;
+    overflow-y: auto;
   }
   .nav-seccion { width: 100%; margin: 8px 0 0 4px; }
   #nav-categorias { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }

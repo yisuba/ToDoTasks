@@ -54,9 +54,12 @@
 
         <button id="btn-sec-config" class="nav-seccion-btn" type="button" aria-expanded="false">▸ Configuración</button>
         <div id="contenido-config" hidden>
-          <div class="subtitulo">Tema</div>
-          <button id="tema-oscuro" class="nav-item" type="button"><span class="icono">🌙</span><span class="nombre">Oscuro</span></button>
-          <button id="tema-claro" class="nav-item" type="button"><span class="icono">☀️</span><span class="nombre">Claro</span></button>
+          <label class="fila-config">Tema:
+            <select id="selector-tema">
+              <option value="oscuro">Oscuro</option>
+              <option value="claro">Claro</option>
+            </select>
+          </label>
         </div>
       </div>
     </aside>

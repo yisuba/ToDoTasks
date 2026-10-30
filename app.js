@@ -136,8 +136,7 @@ function aplicarTema(t) {
   tema = t;
   document.documentElement.dataset.tema = t;
   try { localStorage.setItem(TEMA_LOCAL, t); } catch {}
-  $("tema-oscuro").classList.toggle("activo", t === "oscuro");
-  $("tema-claro").classList.toggle("activo", t === "claro");
+  $("selector-tema").value = t;
   render();
 }
 
@@ -145,8 +144,7 @@ function elegirTema(t) {
   aplicarTema(t);
   if (uid) setDoc(refPrefs(), { tema: t }, { merge: true }).catch(alertar);
 }
-$("tema-oscuro").onclick = () => elegirTema("oscuro");
-$("tema-claro").onclick = () => elegirTema("claro");
+$("selector-tema").onchange = e => elegirTema(e.target.value);
 
 function alternarSeccion(contId, btnId, nombre) {
   const c = $(contId);

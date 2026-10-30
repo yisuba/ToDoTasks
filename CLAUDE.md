@@ -4,9 +4,21 @@ App de tareas personal (universidad, personal, proyectos) con anotaciones, categ
 
 Este archivo es el contexto de trabajo: mantenerlo al día cuando cambie algo importante. El tutorial para replicar el proyecto está en `GUIA-CONFIGURACION.md`.
 
+## Preferencias de trabajo
+
+- Si pido enumerar cambios para evaluar si entendiste, enuméralos y espera mi confirmación antes de tocar archivos.
+- Después de cada implementación pedida, responde en este orden:
+  1. Lo que entendiste, resumido.
+  2. Preguntas o propuestas, solo si hay ambigüedad.
+  3. Al final, siempre: **¿QUIERES QUE HAGA COMMIT Y PUSH A MAIN?**
+- No hagas commit ni push a `main` sin una respuesta afirmativa a **¿QUIERES QUE HAGA COMMIT Y PUSH A MAIN?**
+- Antes de pedir permiso de borrado en una carpeta, pregunta: **¿QUIERES QUE PIDA PERMISO DE BORRADO EN LA CARPETA?** El borrado es permanente, sin papelera.
+- Los commits no llevan línea de coautoría de Claude ni línea `Claude-Session`.
+- Responde siempre en español, incluido el texto visible de la interfaz.
+
 ## Archivos
 
-- `index.html`: estructura. Cabecera con el botón de tema; layout con barra lateral (`aside.barra`) y contenido principal (`main`); dos `<dialog>`: `dlg-crear` (nueva categoría) y `dlg-modificar` (editar categorías y papelera). Incluye un pequeño script en `<head>` que aplica el tema guardado antes de pintar.
+- `index.html`: estructura. Cabecera con el título (clicable) y el botón ☰; layout con barra lateral (`aside.barra`) y contenido principal (`main`); dos `<dialog>`: `dlg-crear` (nueva categoría) y `dlg-modificar` (editar categorías). Incluye un pequeño script en `<head>` que aplica el tema guardado antes de pintar.
 - `app.js`: toda la lógica (Firebase, render, filtro por categoría, migración). Módulo ES cargado desde `index.html`.
 - `style.css`: estilos. Colores en variables CSS en `:root` (oscuro) y `[data-tema="claro"]`. Bajo 700 px, la barra lateral pasa arriba en horizontal.
 - No hay build, ni npm, ni dependencias locales. Firebase se carga desde gstatic.com.
@@ -32,13 +44,15 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 
 ## Decisiones tomadas
 
-- **Modo oscuro por defecto.** Botón ☀️/🌙 arriba a la derecha. El tema se guarda en `ajustes/prefs` (sincroniza entre dispositivos) y en `localStorage` como copia para el primer pintado.
-- **Barra lateral** (estilo Google Tareas): casilla "Todas las tareas" (marca o desmarca todas), una casilla por categoría con punto de color y conteo de pendientes, botones "Crear categoría" (abre `dlg-crear`) y "Modificar categorías" (abre `dlg-modificar`), y al final "Papelera" (cambia la vista principal). Todas las casillas empiezan marcadas. Las categorías desmarcadas se guardan en `ocultas` (Set en memoria): sus tareas no se muestran. Destacadas se eliminó por no tener función. El botón de cerrar sesión se quitó por ahora.
-- **Vista Papelera:** muestra las categorías en papelera (Restaurar / Eliminar definitivamente) y solo las tareas de esas categorías. Oculta el formulario de nueva tarea.
+- **Modo oscuro por defecto.** El tema se elige en el desplegable "Configuración > Tema: Oscuro / Claro". Se guarda en `ajustes/prefs` (sincroniza entre dispositivos) y en `localStorage` como copia para el primer pintado.
+- **Barra lateral:** casilla "Todas las tareas" (marca o desmarca todas); sección **Categorías** desplegable con "+ Crear categoría" arriba, una casilla por categoría (con punto de color y conteo de pendientes) y "✎ Modificar categorías" al final; "Papelera" (cambia la vista principal); y sección **Configuración** desplegable con el selector de tema. Todas las casillas empiezan marcadas. Las categorías desmarcadas se guardan en `ocultas` (Set en memoria), así que no persisten entre recargas. Destacadas se eliminó por no tener función. No hay botón de cerrar sesión por ahora.
+- **Título clicable:** vuelve a "Todas las tareas" con todas las categorías marcadas y sale de la papelera.
+- **Menú ☰:** muestra u oculta la barra lateral. Empieza abierto y no se guarda entre recargas.
+- **Vista Papelera:** muestra las categorías en papelera (Restaurar / Eliminar definitivamente) y solo las tareas de esas categorías. Oculta el formulario de nueva tarea y la fila de orden.
 - **Categorías por usuario, editables.** Las tareas guardan el id de categoría, así que renombrar no rompe nada. Borrar manda la categoría a la papelera (`eliminada: true`) tras confirmar. Las tareas de una categoría en papelera no aparecen en la vista normal. Al eliminar definitivamente, sus tareas quedan "Sin categoría" y se muestran en la vista normal.
 - **Tonos por tarea.** Cada tarea elige uno de 8 tonos dentro del matiz de su categoría. En la tarjeta se ve un círculo (`button.tono-btn`) con el tono actual; al hacer clic despliega una cuadrícula de 4 columnas (`.tono-menu`) solo con colores, sin números. Los colores se generan con HSL: claro usa luminosidad 94 a 59 con saturación 60; oscuro usa 18 a 42.5 con saturación 30. Cambiar el matiz de la categoría actualiza todas sus tareas.
 - **Deadline opcional, en hora de Santiago.** Se guarda como timestamp (instante UTC). Al ingresar, se convierte la hora de Santiago con `Intl` (`santiagoAUTC`). Se muestra como "Vence: sáb 7 nov, 18:00", sin sufijo. Las vencidas y no hechas tienen borde rojo.
-- **Orden predeterminado: deadline próximo primero** (dentro de cada lista, la más próxima arriba; sin deadline al final). La otra opción es "Más recientes".
+- **Orden predeterminado: deadline próximo primero** (dentro de cada lista, la más próxima arriba; sin deadline al final). La otra opción es "Más recientes". La fila "Ordenar por" va alineada a la izquierda, debajo de una línea separadora.
 - **Migración:** `migrar()` copia las tareas de la raíz a la estructura nueva una sola vez (controlada por `migrado`).
 
 ## Convenciones
@@ -46,9 +60,6 @@ Reglas de Firestore (publicadas en la consola, no están en el repo): solo el co
 - Textos de interfaz en español.
 - Nunca insertar datos del usuario con `innerHTML`: usar `el()` con `textContent`.
 - Los errores de Firestore se muestran con `alertar`.
-- No hacer commit ni push sin que lo pida el usuario en ese momento. Los cambios también se pueden publicar desde GitHub Desktop.
-- Después de cada implementación pedida, responder en este orden: (1) lo entendido, resumido; (2) preguntas o propuestas, solo si hay ambigüedad; (3) al final: ¿QUIERES QUE HAGA COMMIT Y PUSH A MAIN? Antes de pedir permiso de borrado en la carpeta: ¿QUIERES QUE PIDA PERMISO DE BORRADO EN LA CARPETA?
-- Responder siempre en español, incluido el texto visible de la interfaz.
 
 ## Pendientes y limitaciones conocidas
 

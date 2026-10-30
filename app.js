@@ -56,7 +56,7 @@ document.addEventListener("click", e => {
 
 // ---------- Fechas (siempre hora de Santiago) ----------
 const fmtFecha = new Intl.DateTimeFormat("es-CL", {
-  timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
+  timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
 });
 
 function partesSantiago(ms) {
@@ -290,8 +290,6 @@ document.addEventListener("click", e => {
 });
 $("btn-crear-cat").onclick = () => { renderFormCategoria(); $("dlg-crear").showModal(); };
 $("btn-cancelar-cat").onclick = () => $("dlg-crear").close();
-$("btn-modificar-cat").onclick = () => $("dlg-modificar").showModal();
-$("btn-cerrar-mod").onclick = () => $("dlg-modificar").close();
 
 // ---------- Crear categoría ----------
 $("form-categoria").onsubmit = async e => {
@@ -312,7 +310,6 @@ $("form-categoria").onsubmit = async e => {
 function render() {
   renderNav();
   renderSelectCategorias();
-  renderCategorias();
   renderFormCategoria();
   renderVista();
 }
@@ -341,6 +338,7 @@ function renderNav() {
   nav.innerHTML = "";
   activas.forEach(c => {
     const pendientes = tareas.filter(t => t.categoriaId === c.id && !t.hecha).length;
+    const fila = el("div", "nav-item-cat");
     const lbl = el("label", "nav-item");
     const cb = el("input");
     cb.type = "checkbox";
@@ -353,7 +351,8 @@ function renderNav() {
     const punto = el("span", "punto");
     punto.style.background = colorTono(c.hue, 2, oscuro());
     lbl.append(cb, punto, el("span", "nombre", c.nombre), el("span", "conteo", String(pendientes)));
-    nav.appendChild(lbl);
+    fila.append(lbl, menuCategoria(c));
+    nav.appendChild(fila);
   });
 
   const eliminadas = categorias.filter(c => c.eliminada).length;
@@ -374,16 +373,20 @@ function renderSelectCategorias() {
   $("btn-agregar").disabled = sel.options.length === 0;
 }
 
-// Lista de categorías dentro de "Modificar categorías"
-function renderCategorias() {
-  const cont = $("lista-categorias");
-  cont.innerHTML = "";
-  categoriasActivas().forEach(c => cont.appendChild(filaCategoria(c)));
-}
+// Botón de tres puntos al lado de cada categoría: cambiar color, cambiar nombre, eliminar
+function menuCategoria(c) {
+  const wrap = el("div", "cat-acciones");
+  const btn = botonIcono(ICONO_PUNTOS, "cat-menu-btn", "Opciones de la categoría");
 
-function filaCategoria(c) {
-  const fila = el("div", "cat-fila");
+  const menu = el("div", "menu-flotante cat-menu");
+  menu.hidden = true;
 
+  const panelColor = el("div", "menu-panel");
+  panelColor.hidden = true;
+  panelColor.appendChild(swatches(c.hue, h => updateDoc(refCat(c.id), { hue: h }).catch(alertar)));
+
+  const panelNombre = el("div", "menu-panel");
+  panelNombre.hidden = true;
   const nombre = el("input");
   nombre.type = "text";
   nombre.maxLength = 30;
@@ -393,20 +396,38 @@ function filaCategoria(c) {
     if (!v) { nombre.value = c.nombre; return; }
     updateDoc(refCat(c.id), { nombre: v }).catch(alertar);
   };
+  panelNombre.appendChild(nombre);
 
-  const sw = swatches(c.hue, h => updateDoc(refCat(c.id), { hue: h }).catch(alertar));
+  const opColor = el("button", "menu-op", "Cambiar color");
+  opColor.type = "button";
+  opColor.onclick = () => {
+    panelColor.hidden = !panelColor.hidden;
+    panelNombre.hidden = true;
+  };
+
+  const opNombre = el("button", "menu-op", "Cambiar nombre");
+  opNombre.type = "button";
+  opNombre.onclick = () => {
+    panelNombre.hidden = !panelNombre.hidden;
+    panelColor.hidden = true;
+  };
 
   const n = tareas.filter(t => t.categoriaId === c.id).length;
-  const borrar = botonIcono(ICONO_BASURA, "peligro pequeno", "Eliminar definitivamente");
-  borrar.title = "Mover a la papelera";
-  borrar.onclick = () => {
+  const opEliminar = el("button", "menu-op peligro-txt", "Eliminar");
+  opEliminar.type = "button";
+  opEliminar.onclick = () => {
     let msg = `¿Mover "${c.nombre}" a la papelera?`;
     if (n) msg += `\nSus ${n} tarea(s) quedarán en la papelera junto con la categoría.`;
     if (confirm(msg)) updateDoc(refCat(c.id), { eliminada: true }).catch(alertar);
   };
 
-  fila.append(nombre, sw, borrar);
-  return fila;
+  menu.append(opColor, panelColor, opNombre, panelNombre, opEliminar);
+  btn.onclick = e => {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+  };
+  wrap.append(btn, menu);
+  return wrap;
 }
 
 // Fila de una categoría en la papelera (vista Papelera)
@@ -493,7 +514,8 @@ function renderVista() {
 
 // Iconos SVG en línea (sin emojis)
 const ICONO_CALENDARIO = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
-const ICONO_BASURA = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+const ICONO_PUNTOS = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+const ICONO_BASURA ='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
 
 // Botón que solo muestra un icono SVG
 function botonIcono(svg, clase, titulo) {
@@ -541,7 +563,7 @@ function selectorFecha(t, ref) {
   const menu = el("div", "menu-flotante fecha-menu");
   menu.hidden = true;
 
-  const cambiar = el("label", "fecha-op", "Cambiar fecha");
+  const cambiar = el("label", "menu-op", "Cambiar fecha");
   const inp = el("input", "overlay-fecha");
   inp.type = "datetime-local";
   inp.title = "Deadline (hora de Santiago)";
@@ -553,7 +575,7 @@ function selectorFecha(t, ref) {
   menu.appendChild(cambiar);
 
   if (t.deadline) {
-    const quitar = el("button", "fecha-op", "Quitar deadline");
+    const quitar = el("button", "menu-op", "Quitar deadline");
     quitar.type = "button";
     quitar.onclick = () => updateDoc(ref, { deadline: null }).catch(alertar);
     menu.appendChild(quitar);

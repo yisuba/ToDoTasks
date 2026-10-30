@@ -249,7 +249,8 @@ main h2 { margin: 0 0 12px; font-size: 1.3rem; }
   min-width: 190px;
   padding: 6px;
 }
-.fecha-op {
+/* Opciones de los menús flotantes (calendario y categorías) */
+.menu-op {
   display: block;
   position: relative;
   width: 100%;
@@ -262,7 +263,34 @@ main h2 { margin: 0 0 12px; font-size: 1.3rem; }
   text-align: left;
   cursor: pointer;
 }
-.fecha-op:hover { background: var(--hover); }
+.menu-op:hover { background: var(--hover); }
+.menu-op.peligro-txt { color: var(--peligro); }
+
+/* Categoría en la barra: nombre + botón de tres puntos */
+.nav-item-cat {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.nav-item-cat > .nav-item { flex: 1; min-width: 0; width: auto; }
+
+.cat-acciones { position: relative; display: flex; }
+.cat-menu-btn {
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--muted);
+  line-height: 0;
+}
+.cat-menu-btn:hover { background: var(--hover); color: var(--texto); }
+.cat-menu {
+  top: 100%;
+  left: auto;
+  right: 0;
+  min-width: 200px;
+  padding: 6px;
+}
+.menu-panel { padding: 6px 10px 8px; }
+.menu-panel input { width: 100%; }
 
 .tono-wrap { position: relative; display: inline-flex; }
 .tono-btn {
